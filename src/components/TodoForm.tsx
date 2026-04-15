@@ -10,10 +10,10 @@ import { X, CalendarIcon } from 'lucide-react'
 
 const todoSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  description: z.string().optional(),
-  category_id: z.string().optional(),
+  description: z.string().nullable().optional(),
+  category_id: z.string().nullable().optional(),
   priority: z.enum(['low', 'medium', 'high']),
-  due_date: z.string().optional(),
+  due_date: z.string().nullable().optional(),
 })
 
 interface TodoFormProps {
@@ -109,12 +109,12 @@ export default function TodoForm({ onClose, todo }: TodoFormProps) {
       return
     }
 
-    // 清理空字符串，转换为 null
+    // 清理空字符串，转换为 undefined (避免发送 null)
     const cleanData = {
       ...data,
-      description: data.description?.trim() || null,
-      category_id: data.category_id?.trim() || null,
-      due_date: data.due_date?.trim() || null,
+      description: data.description?.trim() || undefined,
+      category_id: data.category_id?.trim() || undefined,
+      due_date: data.due_date?.trim() || undefined,
     }
 
     todoMutation.mutate(cleanData)

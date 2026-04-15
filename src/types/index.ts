@@ -31,10 +31,10 @@ export interface Todo {
 
 export interface TodoFormData {
   title: string
-  description?: string
-  category_id?: string
+  description?: string | null
+  category_id?: string | null
   priority: 'low' | 'medium' | 'high'
-  due_date?: string
+  due_date?: string | null
 }
 
 export interface CategoryFormData {
