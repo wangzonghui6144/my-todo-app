@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { CalendarDays, ListTodo, Plus, Star, Sun } from 'lucide-react'
+import { CalendarDays, Inbox, ListTodo, Plus, Star, Sun } from 'lucide-react'
 import { useLocale } from '@/lib/i18n/provider'
 import { t } from '@/lib/i18n/messages'
 import { useCreateList, useLists } from '@/features/lists/hooks'
@@ -72,6 +72,14 @@ export function Sidebar() {
         >
           <CalendarDays className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.planned')}
+        </Link>
+        <Link
+          href="/invites"
+          onClick={closeDrawer}
+          className={navClass(pathname === '/invites')}
+        >
+          <Inbox className="size-4 shrink-0" aria-hidden />
+          {t(locale, 'nav.invites')}
         </Link>
 
         {defaultList && (

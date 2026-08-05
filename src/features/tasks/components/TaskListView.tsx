@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import type { Task } from '@/types/database'
 import { useAllTasks, useTasksForList } from '../hooks'
 import { TaskComposer } from './TaskComposer'
@@ -16,6 +17,7 @@ type TaskListViewProps = {
     my_day_on?: string | null
   }
   headerClassName?: string
+  headerActions?: ReactNode
 }
 
 export function TaskListView({
@@ -25,6 +27,7 @@ export function TaskListView({
   filter,
   composeDefaults,
   headerClassName,
+  headerActions,
 }: TaskListViewProps) {
   const listQuery = useTasksForList(listId ?? '')
   const allQuery = useAllTasks()
