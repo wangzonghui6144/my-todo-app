@@ -18,15 +18,15 @@ export function ListTasksPage({ listId }: ListTasksPageProps) {
   const canShare = Boolean(list && !list.is_default)
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      {canShare && list ? (
-        <div className="flex justify-end border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1">
+    <TaskListView
+      title={title}
+      listId={listId}
+      composeListId={listId}
+      headerActions={
+        canShare && list ? (
           <ShareListDialog listId={list.id} listName={list.name} />
-        </div>
-      ) : null}
-      <div className="min-h-0 flex-1">
-        <TaskListView title={title} listId={listId} composeListId={listId} />
-      </div>
-    </div>
+        ) : null
+      }
+    />
   )
 }

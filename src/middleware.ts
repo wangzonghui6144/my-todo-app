@@ -11,7 +11,7 @@ function withSupabaseCookies(from: NextResponse, to: NextResponse) {
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
   const path = request.nextUrl.pathname
-  const isAuth = path.startsWith('/login') || path.startsWith('/auth')
+  const isAuth = path.startsWith('/login')
 
   if (!user && !isAuth) {
     const url = request.nextUrl.clone()

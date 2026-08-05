@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# To Do
 
-## Getting Started
+Microsoft To Do–style task manager built with Next.js App Router, Supabase (Auth, Postgres, Storage, Realtime), React Query, and Tailwind CSS.
 
-First, run the development server:
+## Setup
+
+### 1. Environment variables
+
+Copy the example values into `.env.local`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_KEY
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Apply database migrations
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Migrations live in `supabase/migrations/`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `20260805000000_init.sql` — schema, RLS, signup trigger, attachments bucket
+- `20260805000001_storage_policies.sql` — storage RLS for `task-attachments`
+- `20260805000002_invite_accept.sql` — invite accept/decline for pending members
 
-## Learn More
+With the [Supabase CLI](https://supabase.com/docs/guides/cli) linked to your project:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+supabase db push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Or run each SQL file in the Supabase SQL editor (in filename order).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Also enable Realtime for `tasks`, `lists`, and `list_members` in the Supabase dashboard if not already enabled.
 
-## Deploy on Vercel
+### 3. Install and run
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm install
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000). Unauthenticated users are redirected to `/login`.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest unit tests |
+
+## Deploy
+
+This app uses Next.js middleware and Supabase SSR cookies, so it needs a Node.js host (e.g. Vercel). Static `output: 'export'` / GitHub Pages is not supported.
+
+## Features
+
+- Default home: Tasks list (任务)
+- Smart lists: My Day, Important, Planned
+- Custom lists with optional email sharing (editor/viewer)
+- Task detail: steps, notes, My Day, remind/due, recurrence, attachments
+- zh/en locale and light/dark theme persisted on `profiles`
+- Realtime invalidation for tasks/lists membership changes

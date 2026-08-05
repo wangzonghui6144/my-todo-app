@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useLocale } from '@/lib/i18n/provider'
 import { t } from '@/lib/i18n/messages'
 import { useProfile, useUpdateProfileSettings } from '../hooks'
@@ -13,18 +12,10 @@ export function ThemeToggle() {
   const { locale } = useLocale()
   const { data: profile } = useProfile()
   const updateSettings = useUpdateProfileSettings()
-  const [theme, setTheme] = useState('light')
-
-  useEffect(() => {
-    if (profile?.theme) {
-      setTheme(profile.theme)
-      applyTheme(profile.theme)
-    }
-  }, [profile?.theme])
+  const theme = profile?.theme === 'dark' ? 'dark' : 'light'
 
   const toggle = () => {
     const next = theme === 'light' ? 'dark' : 'light'
-    setTheme(next)
     applyTheme(next)
     updateSettings.mutate({ theme: next })
   }
