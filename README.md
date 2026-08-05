@@ -52,7 +52,15 @@ Open [http://localhost:3000](http://localhost:3000). Unauthenticated users are r
 
 ## Deploy
 
-This app uses Next.js middleware and Supabase SSR cookies, so it needs a Node.js host (e.g. Vercel). Static `output: 'export'` / GitHub Pages is not supported.
+This app uses Next.js middleware and Supabase SSR cookies, so it needs a Node.js host. **GitHub Pages is not supported.**
+
+### Vercel (recommended)
+
+1. Import `wangzonghui6144/my-todo-app` in [Vercel](https://vercel.com/new)
+2. Set env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Deploy from `master` — subsequent pushes auto-deploy
+
+CI on GitHub Actions only runs `test` + `build` (see `.github/workflows/ci.yml`).
 
 ## Features
 
