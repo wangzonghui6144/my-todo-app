@@ -6,6 +6,7 @@ import type { Recurrence, Task } from '@/types/database'
 import { useLocale } from '@/lib/i18n/provider'
 import { t } from '@/lib/i18n/messages'
 import { useShellStore } from '@/features/ui/shell-store'
+import { AttachmentList } from '@/features/attachments/components/AttachmentList'
 import { todayLocalIso } from '../api'
 import {
   useAddStep,
@@ -237,6 +238,8 @@ function TaskDetailBody({ task, onClose }: TaskDetailBodyProps) {
             className="w-full resize-y rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1.5 text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-accent)]"
           />
         </label>
+
+        <AttachmentList taskId={task.id} />
       </div>
 
       <div className="border-t border-[var(--color-border)] p-3">
