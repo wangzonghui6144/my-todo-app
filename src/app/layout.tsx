@@ -1,34 +1,18 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Providers } from "./providers";
-
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from 'next'
+import './globals.css'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: "My Todo App",
-  description: "A beautiful and functional todo application",
-  keywords: ["todo", "task", "productivity", "nextjs"],
-  authors: [{ name: "Your Name" }],
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-};
+  title: 'To Do',
+  description: 'Microsoft To Do–style task manager',
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className={`${inter.className} min-h-full flex flex-col`}>
-        <Providers>
-          {children}
-        </Providers>
+    <html lang="zh-CN" className="h-full antialiased">
+      <body className="min-h-full flex flex-col font-sans text-[var(--color-text)] bg-[var(--color-bg)]">
+        <Providers>{children}</Providers>
       </body>
     </html>
-  );
+  )
 }
