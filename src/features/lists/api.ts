@@ -32,3 +32,24 @@ export async function createList(name: string, color = '#0B5CAB'): Promise<List>
   if (error) throw error
   return data as List
 }
+
+export async function updateList(
+  id: string,
+  patch: { name?: string; color?: string }
+): Promise<List> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('lists')
+    .update(patch)
+    .eq('id', id)
+    .select('*')
+    .single()
+  if (error) throw error
+  return data as List
+}
+
+export async function deleteList(id: string): Promise<void> {
+  const supabase = createClient()
+  const { error } = await supabase.from('lists').delete().eq('id', id)
+  if (error) throw error
+}
