@@ -2,6 +2,8 @@
 
 import { Menu, X } from 'lucide-react'
 import { useShellStore } from '@/features/ui/shell-store'
+import { TaskDetailPanel } from '@/features/tasks/components/TaskDetailPanel'
+import { TaskDetailSheet } from '@/features/tasks/components/TaskDetailSheet'
 import { Sidebar } from './Sidebar'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -40,8 +42,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </main>
 
         {selectedTaskId ? (
-          <aside className="app-shell-detail hidden border-l border-[var(--color-border)] bg-[var(--color-surface)] lg:block">
-            {/* Detail host filled in Task 11 */}
+          <aside className="app-shell-detail hidden min-h-0 border-l border-[var(--color-border)] bg-[var(--color-surface)] lg:block">
+            <TaskDetailPanel />
           </aside>
         ) : null}
       </div>
@@ -71,6 +73,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       ) : null}
+
+      <TaskDetailSheet />
     </div>
   )
 }

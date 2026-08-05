@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Task } from '@/types/database'
+import type { Task, TaskStep } from '@/types/database'
 import {
   createTask,
   deleteTask,
@@ -11,11 +11,14 @@ import {
   updateTask,
   type TaskPatch,
 } from './api'
+import { addStep, fetchSteps, toggleStep } from './api-steps'
 
 export const allTasksQueryKey = ['tasks', 'all'] as const
 export const listTasksQueryKey = (listId: string) =>
   ['tasks', 'list', listId] as const
 export const taskQueryKey = (id: string) => ['tasks', 'one', id] as const
+export const stepsQueryKey = (taskId: string) =>
+  ['tasks', 'steps', taskId] as const
 
 function patchTaskInList(list: Task[] | undefined, id: string, patch: TaskPatch) {
   if (!list) return list
@@ -136,6 +139,50 @@ export function useDeleteTask() {
     onSuccess: (_void, id) => {
       void queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.removeQueries({ queryKey: taskQueryKey(id) })
+    },
+  })
+}
+
+export function useTaskSteps(taskId: string | null) {
+  return useQuery({
+    queryKey: stepsQueryKey(taskId ?? ''),
+    queryFn: () => fetchSteps(taskId!),
+    enabled: Boolean(taskId),
+  })
+}
+
+export function useAddStep(taskId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (title: string) => addStep(taskId, title),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: stepsQueryKey(taskId) })
+    },
+  })
+}
+
+export function useToggleStep(taskId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, is_completed }: { id: string; is_completed: boolean }) =>
+      toggleStep(id, is_completed),
+    onMutate: async ({ id, is_completed }) => {
+      await queryClient.cancelQueries({ queryKey: stepsQueryKey(taskId) })
+      const previous = queryClient.getQueryData<TaskStep[]>(stepsQueryKey(taskId))
+      queryClient.setQueryData<TaskStep[]>(stepsQueryKey(taskId), (old) =>
+        old?.map((step) =>
+          step.id === id ? { ...step, is_completed } : step
+        )
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(stepsQueryKey(taskId), context.previous)
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: stepsQueryKey(taskId) })
     },
   })
 }
