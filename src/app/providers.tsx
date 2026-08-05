@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LocaleProvider } from '@/lib/i18n/provider'
+import { useAuthStore } from '@/store/authStore'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,6 +15,10 @@ const queryClient = new QueryClient({
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    useAuthStore.getState().checkUser()
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <LocaleProvider>{children}</LocaleProvider>

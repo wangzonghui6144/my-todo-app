@@ -16,14 +16,14 @@ export default function Home() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/auth')
+      router.push('/login')
     }
   }, [user, isLoading, router])
 
   const handleSignOut = async () => {
     try {
       await signOut()
-      router.push('/auth')
+      router.push('/login')
     } catch (error) {
       console.error('Sign out error:', error)
     }
