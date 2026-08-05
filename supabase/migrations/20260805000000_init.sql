@@ -146,11 +146,47 @@ create policy list_members_insert on public.list_members
   for insert with check (
     exists (select 1 from public.lists l where l.id = list_id and l.owner_id = auth.uid())
   );
-create policy list_members_update on public.list_members
-  for update using (
+
+-- Owners manage memberships
+create policy list_members_update_owner on public.list_members
+  for update
+  using (
     exists (select 1 from public.lists l where l.id = list_id and l.owner_id = auth.uid())
-    or (user_id = auth.uid())
+  )
+  with check (
+    exists (select 1 from public.lists l where l.id = list_id and l.owner_id = auth.uid())
   );
+
+-- Members may only update status on their own membership row (not role/list_id)
+-- Enforce via trigger:
+create or replace function public.enforce_list_member_self_update()
+returns trigger
+language plpgsql
+as $$
+begin
+  if exists (select 1 from public.lists l where l.id = old.list_id and l.owner_id = auth.uid()) then
+    return new;
+  end if;
+  if old.user_id is distinct from auth.uid() then
+    raise exception 'not allowed';
+  end if;
+  if new.list_id is distinct from old.list_id or new.role is distinct from old.role or new.invited_email is distinct from old.invited_email then
+    raise exception 'members can only change status';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_list_member_self_update on public.list_members;
+create trigger trg_list_member_self_update
+  before update on public.list_members
+  for each row execute function public.enforce_list_member_self_update();
+
+create policy list_members_update_self on public.list_members
+  for update
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
 create policy list_members_delete on public.list_members
   for delete using (
     exists (select 1 from public.lists l where l.id = list_id and l.owner_id = auth.uid())
