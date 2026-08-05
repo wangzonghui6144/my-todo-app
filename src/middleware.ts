@@ -1,6 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+function withSupabaseCookies(from: NextResponse, to: NextResponse) {
+  from.cookies.getAll().forEach(({ name, value }) => {
+    to.cookies.set(name, value)
+  })
+  return to
+}
+
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
   const path = request.nextUrl.pathname
@@ -9,12 +16,12 @@ export async function middleware(request: NextRequest) {
   if (!user && !isAuth) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(supabaseResponse, NextResponse.redirect(url))
   }
   if (user && isAuth) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
-    return NextResponse.redirect(url)
+    return withSupabaseCookies(supabaseResponse, NextResponse.redirect(url))
   }
   return supabaseResponse
 }
