@@ -6,6 +6,8 @@ import { CalendarDays, Inbox, ListTodo, Plus, Star, Sun } from 'lucide-react'
 import { useLocale } from '@/lib/i18n/provider'
 import { t } from '@/lib/i18n/messages'
 import { useCreateList, useLists } from '@/features/lists/hooks'
+import { LocaleToggle } from '@/features/settings/components/LocaleToggle'
+import { ThemeToggle } from '@/features/settings/components/ThemeToggle'
 import { useShellStore } from '@/features/ui/shell-store'
 
 function navClass(active: boolean) {
@@ -116,7 +118,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-[var(--color-border)] p-2">
+      <div className="space-y-1 border-t border-[var(--color-border)] p-2">
         <button
           type="button"
           onClick={handleNewList}
@@ -126,6 +128,8 @@ export function Sidebar() {
           <Plus className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.newList')}
         </button>
+        <LocaleToggle />
+        <ThemeToggle />
       </div>
     </aside>
   )

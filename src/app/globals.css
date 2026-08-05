@@ -16,6 +16,19 @@
   --shell-detail: 300px;
 }
 
+html[data-theme='dark'] {
+  --color-accent: #4da3ff;
+  --color-accent-hover: #78b7ff;
+  --color-bg: #1b1a19;
+  --color-surface: #252423;
+  --color-sidebar: #201f1e;
+  --color-border: #3b3a39;
+  --color-text: #f3f2f1;
+  --color-text-secondary: #e1dfdd;
+  --color-text-muted: #a19f9d;
+  --color-danger: #f1707b;
+}
+
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);

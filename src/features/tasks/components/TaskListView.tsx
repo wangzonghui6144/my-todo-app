@@ -2,6 +2,8 @@
 
 import type { ReactNode } from 'react'
 import type { Task } from '@/types/database'
+import { useLocale } from '@/lib/i18n/provider'
+import { t } from '@/lib/i18n/messages'
 import { useAllTasks, useTasksForList } from '../hooks'
 import { TaskComposer } from './TaskComposer'
 import { TaskRow } from './TaskRow'
@@ -29,6 +31,7 @@ export function TaskListView({
   headerClassName,
   headerActions,
 }: TaskListViewProps) {
+  const { locale } = useLocale()
   const listQuery = useTasksForList(listId ?? '')
   const allQuery = useAllTasks()
   const query = listId ? listQuery : allQuery
@@ -43,7 +46,7 @@ export function TaskListView({
     <div className="flex h-full min-h-0 flex-col">
       <header
         className={[
-          'border-b border-[var(--color-border)] px-4 py-5',
+          'flex items-start justify-between gap-2 border-b border-[var(--color-border)] px-4 py-5',
           headerClassName ?? 'bg-[var(--color-surface)]',
         ].join(' ')}
       >
@@ -55,6 +58,7 @@ export function TaskListView({
         >
           {title}
         </h1>
+        {headerActions}
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -62,7 +66,7 @@ export function TaskListView({
           <p className="px-4 py-6 text-sm text-[var(--color-text-muted)]">…</p>
         ) : incomplete.length === 0 && completed.length === 0 ? (
           <p className="px-4 py-6 text-sm text-[var(--color-text-muted)]">
-            No tasks yet
+            {t(locale, 'task.empty')}
           </p>
         ) : (
           <>
@@ -72,7 +76,7 @@ export function TaskListView({
             {completed.length > 0 && (
               <div className="mt-4">
                 <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-                  Completed
+                  {t(locale, 'task.completed')}
                 </p>
                 {completed.map((task) => (
                   <TaskRow key={task.id} task={task} />

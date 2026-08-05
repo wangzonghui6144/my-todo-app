@@ -92,13 +92,13 @@ function AuthFormFields({
         {isSignUp && (
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text)]">
-              Name
+              {t(locale, 'auth.name')}
             </label>
             <input
               id="name"
               type="text"
               autoComplete="name"
-              placeholder="Your name"
+              placeholder={t(locale, 'auth.name')}
               className={fieldClassName}
               {...register('name')}
             />
@@ -110,7 +110,7 @@ function AuthFormFields({
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text)]">
-            Email
+            {t(locale, 'auth.email')}
           </label>
           <input
             id="email"
@@ -127,13 +127,13 @@ function AuthFormFields({
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-[var(--color-text)]">
-            Password
+            {t(locale, 'auth.password')}
           </label>
           <input
             id="password"
             type="password"
             autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            placeholder="Password"
+            placeholder={t(locale, 'auth.password')}
             className={fieldClassName}
             {...register('password')}
           />
@@ -153,7 +153,11 @@ function AuthFormFields({
           disabled={isSubmitting}
           className="flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--color-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? 'Loading...' : isSignUp ? t(locale, 'auth.signUp') : t(locale, 'auth.signIn')}
+          {isSubmitting
+            ? t(locale, 'auth.loading')
+            : isSignUp
+              ? t(locale, 'auth.signUp')
+              : t(locale, 'auth.signIn')}
         </button>
 
         <div className="text-center">
@@ -163,8 +167,8 @@ function AuthFormFields({
             className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] hover:underline"
           >
             {isSignUp
-              ? 'Already have an account? Sign in'
-              : "Don't have an account? Sign up"}
+              ? t(locale, 'auth.toggleToSignIn')
+              : t(locale, 'auth.toggleToSignUp')}
           </button>
         </div>
       </form>
