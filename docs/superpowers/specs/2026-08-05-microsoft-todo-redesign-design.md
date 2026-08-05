@@ -93,7 +93,7 @@ Tasks **are** persisted and bound to users. Smart lists are **query views**, not
 - `is_important`  
 - `my_day_on` (date | null) — persistence for My Day  
 - `due_at`, `remind_at`  
-- `recurrence` (text; basic RRULE or enum: none/daily/weekly/weekdays)  
+- `recurrence` (enum: `none` | `daily` | `weekly` | `weekdays` — P0; RRULE deferred)  
 - `sort_order`  
 - `created_at`, `updated_at`
 
@@ -202,6 +202,6 @@ supabase/
 | Smart lists | Query views; fields on `tasks` |
 | Desktop grid | Main column widest; high text contrast |
 
-## 9. Open follow-ups (resolved enough to plan)
+## 9. Open follow-ups
 
-None blocking. Recurrence storage format (RRULE string vs enum) to be fixed in the implementation plan with a single choice.
+None blocking. Recurrence for P0 is a closed enum (`none` / `daily` / `weekly` / `weekdays`); full RRULE is out of scope.
