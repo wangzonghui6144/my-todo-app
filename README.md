@@ -20,6 +20,7 @@ Migrations live in `supabase/migrations/`:
 - `20260805000000_init.sql` — schema, RLS, signup trigger, attachments bucket
 - `20260805000001_storage_policies.sql` — storage RLS for `task-attachments`
 - `20260805000002_invite_accept.sql` — invite accept/decline for pending members
+- `20260805000003_storage_shared_access.sql` — shared-list attachment reads
 
 With the [Supabase CLI](https://supabase.com/docs/guides/cli) linked to your project:
 
