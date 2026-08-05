@@ -2,7 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { CalendarDays, Inbox, ListTodo, Pencil, Plus, Star, Sun, Trash2 } from 'lucide-react'
+import {
+  CalendarDays,
+  Inbox,
+  ListTodo,
+  Pencil,
+  Plus,
+  Star,
+  Sun,
+  Trash2,
+} from 'lucide-react'
 import { useLocale } from '@/lib/i18n/provider'
 import { t } from '@/lib/i18n/messages'
 import {
@@ -17,12 +26,7 @@ import { useShellStore } from '@/features/ui/shell-store'
 import type { List } from '@/types/database'
 
 function navClass(active: boolean) {
-  return [
-    'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-    active
-      ? 'bg-[var(--color-surface)] font-semibold text-[var(--color-accent)]'
-      : 'text-[var(--color-text)] hover:bg-[var(--color-surface)]',
-  ].join(' ')
+  return ['side-link', active ? 'side-link--active' : ''].filter(Boolean).join(' ')
 }
 
 export function Sidebar() {
@@ -37,7 +41,6 @@ export function Sidebar() {
 
   const defaultList = lists.find((l) => l.is_default)
   const customLists = lists.filter((l) => !l.is_default)
-
   const closeDrawer = () => setDrawerOpen(false)
 
   const handleNewList = async () => {
@@ -68,7 +71,8 @@ export function Sidebar() {
       await deleteList.mutateAsync(list.id)
       if (pathname === `/list/${list.id}`) {
         closeDrawer()
-        router.push('/myday')
+        if (defaultList) router.push(`/list/${defaultList.id}`)
+        else router.push('/myday')
       }
     } catch (error) {
       console.error('Delete list failed', error)
@@ -76,69 +80,52 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex h-full flex-col bg-[var(--color-sidebar)] text-[var(--color-text)]">
-      <div className="border-b border-[var(--color-border)] px-4 py-4">
-        <p className="text-base font-semibold tracking-tight">To Do</p>
+    <aside className="sidebar">
+      <div className="sidebar__brand">
+        <span className="sidebar__mark" aria-hidden />
+        <p className="sidebar__title">To Do</p>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-        <Link
-          href="/myday"
-          onClick={closeDrawer}
-          className={navClass(pathname === '/myday')}
-        >
+      <nav className="sidebar__nav">
+        <Link href="/myday" prefetch onClick={closeDrawer} className={navClass(pathname === '/myday')}>
           <Sun className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.myday')}
         </Link>
-        <Link
-          href="/important"
-          onClick={closeDrawer}
-          className={navClass(pathname === '/important')}
-        >
+        <Link href="/important" prefetch onClick={closeDrawer} className={navClass(pathname === '/important')}>
           <Star className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.important')}
         </Link>
-        <Link
-          href="/planned"
-          onClick={closeDrawer}
-          className={navClass(pathname === '/planned')}
-        >
+        <Link href="/planned" prefetch onClick={closeDrawer} className={navClass(pathname === '/planned')}>
           <CalendarDays className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.planned')}
         </Link>
-        <Link
-          href="/invites"
-          onClick={closeDrawer}
-          className={navClass(pathname === '/invites')}
-        >
-          <Inbox className="size-4 shrink-0" aria-hidden />
-          {t(locale, 'nav.invites')}
-        </Link>
-
-        {defaultList && (
+        {defaultList ? (
           <Link
             href={`/list/${defaultList.id}`}
+            prefetch
             onClick={closeDrawer}
             className={navClass(pathname === `/list/${defaultList.id}`)}
           >
             <ListTodo className="size-4 shrink-0" aria-hidden />
             {defaultList.name || t(locale, 'nav.tasks')}
           </Link>
-        )}
+        ) : null}
+        <Link href="/invites" prefetch onClick={closeDrawer} className={navClass(pathname === '/invites')}>
+          <Inbox className="size-4 shrink-0" aria-hidden />
+          {t(locale, 'nav.invites')}
+        </Link>
 
-        <div className="my-2 border-t border-[var(--color-border)]" />
+        <div className="sidebar__divider" />
 
-        {isLoading && (
+        {isLoading ? (
           <p className="px-3 py-2 text-sm text-[var(--color-text-muted)]">…</p>
-        )}
+        ) : null}
 
         {customLists.map((list) => (
-          <div
-            key={list.id}
-            className="group flex items-center gap-0.5"
-          >
+          <div key={list.id} className="group flex items-center gap-0.5">
             <Link
               href={`/list/${list.id}`}
+              prefetch
               onClick={closeDrawer}
               className={`${navClass(pathname === `/list/${list.id}`)} min-w-0 flex-1`}
             >
@@ -154,7 +141,7 @@ export function Sidebar() {
               aria-label={t(locale, 'nav.renameList')}
               onClick={() => void handleRename(list)}
               disabled={updateList.isPending}
-              className="rounded p-1.5 text-[var(--color-text-muted)] opacity-0 hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] group-hover:opacity-100 focus:opacity-100 disabled:opacity-50"
+              className="side-icon-btn"
             >
               <Pencil className="size-3.5" aria-hidden />
             </button>
@@ -163,7 +150,7 @@ export function Sidebar() {
               aria-label={t(locale, 'nav.deleteList')}
               onClick={() => void handleDelete(list)}
               disabled={deleteList.isPending}
-              className="rounded p-1.5 text-[var(--color-text-muted)] opacity-0 hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] group-hover:opacity-100 focus:opacity-100 disabled:opacity-50"
+              className="side-icon-btn"
             >
               <Trash2 className="size-3.5" aria-hidden />
             </button>
@@ -171,12 +158,12 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-[var(--color-border)] p-2">
+      <div className="sidebar__footer">
         <button
           type="button"
           onClick={handleNewList}
           disabled={createList.isPending}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-[var(--color-text)] hover:bg-[var(--color-surface)] disabled:opacity-50"
+          className="side-link w-full"
         >
           <Plus className="size-4 shrink-0" aria-hidden />
           {t(locale, 'nav.newList')}

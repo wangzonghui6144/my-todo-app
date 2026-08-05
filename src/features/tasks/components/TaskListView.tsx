@@ -10,84 +10,95 @@ import { TaskRow } from './TaskRow'
 
 type TaskListViewProps = {
   title: string
+  subtitle?: string
   /** When set, loads tasks for this list. Otherwise loads all tasks. */
   listId?: string
-  composeListId: string
+  composeListId?: string
   filter?: (task: Task) => boolean
   composeDefaults?: {
     is_important?: boolean
     my_day_on?: string | null
   }
-  headerClassName?: string
+  variant?: 'default' | 'myday' | 'important' | 'planned'
   headerActions?: ReactNode
 }
 
 export function TaskListView({
   title,
+  subtitle,
   listId,
   composeListId,
   filter,
   composeDefaults,
-  headerClassName,
+  variant = 'default',
   headerActions,
 }: TaskListViewProps) {
   const { locale } = useLocale()
+  const isListScoped = Boolean(listId)
   const listQuery = useTasksForList(listId ?? '')
-  const allQuery = useAllTasks()
-  const query = listId ? listQuery : allQuery
+  const allQuery = useAllTasks(!isListScoped)
+  const query = isListScoped ? listQuery : allQuery
 
   const tasks = (query.data ?? []).filter((task) =>
     filter ? filter(task) : true
   )
   const incomplete = tasks.filter((t) => !t.is_completed)
   const completed = tasks.filter((t) => t.is_completed)
+  const showCached = query.isFetching && !query.isLoading && tasks.length > 0
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <header
-        className={[
-          'flex items-start justify-between gap-2 border-b border-[var(--color-border)] px-4 py-5',
-          headerClassName ?? 'bg-[var(--color-surface)]',
-        ].join(' ')}
-      >
-        <h1
-          className={[
-            'text-xl font-semibold tracking-tight',
-            headerClassName ? 'text-inherit' : 'text-[var(--color-text)]',
-          ].join(' ')}
-        >
-          {title}
-        </h1>
-        {headerActions}
+    <div className="task-view">
+      <header className={`task-hero task-hero--${variant}`}>
+        <div className="task-hero__glow" aria-hidden />
+        <div className="task-hero__content">
+          <div className="min-w-0">
+            <h1 className="task-hero__title">{title}</h1>
+            {subtitle ? <p className="task-hero__subtitle">{subtitle}</p> : null}
+          </div>
+          {headerActions}
+        </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="task-view__body">
         {query.isLoading ? (
-          <p className="px-4 py-6 text-sm text-[var(--color-text-muted)]">…</p>
-        ) : incomplete.length === 0 && completed.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-[var(--color-text-muted)]">
-            {t(locale, 'task.empty')}
+          <div className="task-empty">
+            <div className="task-skeleton" />
+            <div className="task-skeleton" />
+            <div className="task-skeleton task-skeleton--short" />
+          </div>
+        ) : query.isError ? (
+          <p className="task-empty__text text-[var(--color-danger)]">
+            {t(locale, 'task.loadFailed')}
           </p>
+        ) : incomplete.length === 0 && completed.length === 0 ? (
+          <div className="task-empty">
+            <p className="task-empty__text">{t(locale, 'task.empty')}</p>
+            <p className="task-empty__hint">{t(locale, 'task.emptyHint')}</p>
+          </div>
         ) : (
-          <>
-            {incomplete.map((task) => (
-              <TaskRow key={task.id} task={task} />
+          <div className={`task-stack ${showCached ? 'task-stack--soft' : ''}`}>
+            {incomplete.map((task, index) => (
+              <div
+                key={task.id}
+                className="task-stack__item"
+                style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+              >
+                <TaskRow task={task} />
+              </div>
             ))}
             {completed.length > 0 && (
-              <div className="mt-4">
-                <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-                  {t(locale, 'task.completed')}
-                </p>
+              <div className="task-completed-block">
+                <p className="task-completed-label">{t(locale, 'task.completed')}</p>
                 {completed.map((task) => (
                   <TaskRow key={task.id} task={task} />
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
-      <TaskComposer listId={composeListId} defaults={composeDefaults} />
+      <TaskComposer listId={composeListId || listId} defaults={composeDefaults} />
     </div>
   )
 }

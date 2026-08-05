@@ -8,8 +8,10 @@ import { useTasksRealtime } from '@/features/tasks/use-tasks-realtime'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 30_000,
       gcTime: 10 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 })

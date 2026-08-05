@@ -39,13 +39,20 @@ export function useTasksForList(listId: string) {
     queryKey: listTasksQueryKey(listId),
     queryFn: () => fetchTasksForList(listId),
     enabled: Boolean(listId),
+    staleTime: 30_000,
+    retry: 1,
+    placeholderData: (prev) => prev,
   })
 }
 
-export function useAllTasks() {
+export function useAllTasks(enabled = true) {
   return useQuery({
     queryKey: allTasksQueryKey,
     queryFn: fetchAllTasks,
+    enabled,
+    staleTime: 30_000,
+    retry: 1,
+    placeholderData: (prev) => prev,
   })
 }
 

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createList,
   deleteList,
-  fetchDefaultList,
+  ensureDefaultList,
   fetchLists,
   updateList,
 } from './api'
@@ -15,14 +15,29 @@ export function useLists() {
   return useQuery({
     queryKey: listsQueryKey,
     queryFn: fetchLists,
+    staleTime: 60_000,
+    retry: 1,
   })
 }
 
 export function useDefaultList() {
-  return useQuery({
-    queryKey: [...listsQueryKey, 'default'] as const,
-    queryFn: fetchDefaultList,
+  const listsQuery = useLists()
+  const fromCache = listsQuery.data?.find((l) => l.is_default) ?? null
+
+  const ensureQuery = useQuery({
+    queryKey: [...listsQueryKey, 'ensure-default'] as const,
+    queryFn: ensureDefaultList,
+    enabled: listsQuery.isSuccess && !fromCache,
+    staleTime: 60_000,
+    retry: 1,
   })
+
+  return {
+    data: fromCache ?? ensureQuery.data ?? null,
+    isLoading: listsQuery.isLoading || (listsQuery.isSuccess && !fromCache && ensureQuery.isLoading),
+    isError: listsQuery.isError || ensureQuery.isError,
+    error: listsQuery.error ?? ensureQuery.error,
+  }
 }
 
 export function useCreateList() {

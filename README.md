@@ -21,6 +21,7 @@ Migrations live in `supabase/migrations/`:
 - `20260805000001_storage_policies.sql` — storage RLS for `task-attachments`
 - `20260805000002_invite_accept.sql` — invite accept/decline for pending members
 - `20260805000003_storage_shared_access.sql` — shared-list attachment reads
+- `20260805000004_profiles_insert.sql` — allow users to create their own profile row
 
 With the [Supabase CLI](https://supabase.com/docs/guides/cli) linked to your project:
 

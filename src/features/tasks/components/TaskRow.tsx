@@ -14,6 +14,12 @@ export function TaskRow({ task }: TaskRowProps) {
   const selectedTaskId = useShellStore((s) => s.selectedTaskId)
   const updateTask = useUpdateTask()
   const selected = selectedTaskId === task.id
+  const dueLabel = task.due_at
+    ? new Date(task.due_at).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+      })
+    : null
 
   return (
     <div
@@ -27,11 +33,12 @@ export function TaskRow({ task }: TaskRowProps) {
         }
       }}
       className={[
-        'group flex w-full items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 text-left transition-colors',
-        selected
-          ? 'bg-[var(--color-sidebar)]'
-          : 'hover:bg-[var(--color-sidebar)]/60',
-      ].join(' ')}
+        'task-row',
+        selected ? 'task-row--selected' : '',
+        task.is_completed ? 'task-row--done' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       <input
         type="checkbox"
@@ -45,17 +52,13 @@ export function TaskRow({ task }: TaskRowProps) {
             patch: { is_completed: e.target.checked },
           })
         }}
-        className="size-4 shrink-0 accent-[var(--color-accent)]"
+        className="task-row__check"
       />
 
-      <span
-        className={[
-          'min-w-0 flex-1 text-sm text-[var(--color-text)]',
-          task.is_completed ? 'line-through text-[var(--color-text-muted)]' : '',
-        ].join(' ')}
-      >
-        {task.title}
-      </span>
+      <div className="task-row__body">
+        <span className="task-row__title">{task.title}</span>
+        {dueLabel ? <span className="task-row__meta">{dueLabel}</span> : null}
+      </div>
 
       <button
         type="button"
@@ -67,12 +70,11 @@ export function TaskRow({ task }: TaskRowProps) {
             patch: { is_important: !task.is_important },
           })
         }}
-        className="shrink-0 rounded-md p-1.5 text-[var(--color-text-muted)] hover:bg-[var(--color-bg)] hover:text-[var(--color-accent)]"
+        className="task-row__star"
       >
         <Star
           className="size-4"
-          fill={task.is_important ? '#0B5CAB' : 'none'}
-          stroke={task.is_important ? '#0B5CAB' : 'currentColor'}
+          fill={task.is_important ? 'currentColor' : 'none'}
         />
       </button>
     </div>

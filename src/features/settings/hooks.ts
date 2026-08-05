@@ -10,6 +10,8 @@ export function useProfile() {
   return useQuery({
     queryKey: profileQueryKey,
     queryFn: fetchProfile,
+    staleTime: 60_000,
+    retry: 1,
   })
 }
 

@@ -11,11 +11,53 @@ export async function fetchLists(): Promise<List[]> {
   return data as List[]
 }
 
-export async function fetchDefaultList(): Promise<List> {
+export async function fetchDefaultList(): Promise<List | null> {
   const lists = await fetchLists()
-  const def = lists.find((l) => l.is_default)
-  if (!def) throw new Error('Default Tasks list missing')
-  return def
+  return lists.find((l) => l.is_default) ?? null
+}
+
+/** Ensures profile + default Tasks list exist (covers missing signup trigger / migrations). */
+export async function ensureDefaultList(): Promise<List> {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const existing = await fetchDefaultList()
+  if (existing) return existing
+
+  await supabase.from('profiles').upsert(
+    {
+      id: user.id,
+      display_name:
+        (user.user_metadata?.name as string | undefined) ||
+        user.email?.split('@')[0] ||
+        '',
+      locale: 'zh',
+      theme: 'light',
+    },
+    { onConflict: 'id' }
+  )
+
+  const { data, error } = await supabase
+    .from('lists')
+    .insert({
+      owner_id: user.id,
+      name: '任务',
+      color: '#0B5CAB',
+      is_default: true,
+      sort_order: 0,
+    })
+    .select('*')
+    .single()
+
+  if (error) {
+    const again = await fetchDefaultList()
+    if (again) return again
+    throw error
+  }
+  return data as List
 }
 
 export async function createList(name: string, color = '#0B5CAB'): Promise<List> {
@@ -24,6 +66,7 @@ export async function createList(name: string, color = '#0B5CAB'): Promise<List>
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+  await ensureDefaultList()
   const { data, error } = await supabase
     .from('lists')
     .insert({ owner_id: user.id, name, color, is_default: false })

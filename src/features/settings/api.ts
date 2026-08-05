@@ -29,11 +29,18 @@ export async function updateProfileSettings(input: {
 
   const { data, error } = await supabase
     .from('profiles')
-    .update({
-      ...input,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', user.id)
+    .upsert(
+      {
+        id: user.id,
+        display_name:
+          (user.user_metadata?.name as string | undefined) ||
+          user.email?.split('@')[0] ||
+          '',
+        ...input,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' }
+    )
     .select('*')
     .single()
   if (error) throw error

@@ -15,11 +15,23 @@ const titleKey = {
   planned: 'nav.planned',
 } as const
 
+function formatToday(locale: 'zh' | 'en') {
+  const now = new Date()
+  if (locale === 'zh') {
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    return `星期${weekdays[now.getDay()]} · ${now.getMonth() + 1}月${now.getDate()}日`
+  }
+  return now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
 export function SmartTasksPage({ kind }: { kind: SmartKind }) {
   const { locale } = useLocale()
   const { data: defaultList } = useDefaultList()
   const today = todayLocalIso()
-  const composeListId = defaultList?.id ?? ''
 
   const filter =
     kind === 'myday'
@@ -35,18 +47,14 @@ export function SmartTasksPage({ kind }: { kind: SmartKind }) {
         ? { is_important: true }
         : undefined
 
-  const headerClassName =
-    kind === 'myday'
-      ? 'border-transparent bg-gradient-to-br from-[#0a4f96] to-[#4a9fe0] text-white'
-      : undefined
-
   return (
     <TaskListView
       title={t(locale, titleKey[kind])}
-      composeListId={composeListId}
+      subtitle={kind === 'myday' ? formatToday(locale) : undefined}
+      composeListId={defaultList?.id}
       filter={filter}
       composeDefaults={composeDefaults}
-      headerClassName={headerClassName}
+      variant={kind}
     />
   )
 }
