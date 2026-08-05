@@ -1,3 +1,5 @@
+import { SmartTasksPage } from '@/features/tasks/components/SmartTasksPage'
+
 export default function PlannedPage() {
-  return <p className="p-4 text-[var(--color-text)]">Planned</p>
+  return <SmartTasksPage kind="planned" />
 }
