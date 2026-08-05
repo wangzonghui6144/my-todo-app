@@ -34,3 +34,30 @@ body {
     --shell-detail: 320px;
   }
 }
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+}
+
+.app-shell-main {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    grid-template-columns: var(--shell-sidebar) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .app-shell.with-detail {
+    grid-template-columns: var(--shell-sidebar) minmax(0, 1fr) var(--shell-detail);
+  }
+
+  .app-shell-sidebar,
+  .app-shell-detail {
+    min-height: 100dvh;
+  }
+}
